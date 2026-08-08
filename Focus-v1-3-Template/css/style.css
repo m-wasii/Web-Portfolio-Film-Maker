@@ -3509,7 +3509,7 @@ background-position: center center;
         -ms-background-size: cover;
          -o-background-size: cover;
             background-size: cover;
-border: 0;
+border: 100px solid #000;
 z-index: 1;
 }
 
