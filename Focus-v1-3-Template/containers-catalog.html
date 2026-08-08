@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Focus Container Picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/plugins.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Raleway:300,400,600,700%7CMontserrat:400,700%7CPlayfair+Display+SC:400,700" rel="stylesheet">
+    <style>
+        :root {
+            --panel: #121212;
+            --panel-2: #1b1b1b;
+            --line: rgba(255,255,255,.12);
+            --accent: #f5c518;
+            --text: #eee;
+            --muted: #999;
+        }
+        #preloader, .preloader-bg { display: none !important; }
+        .fadeIn-element, .move-down { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+
+        body.picker-page {
+            margin: 0;
+            background: #0a0a0a;
+            color: var(--text);
+            font-family: Raleway, sans-serif;
+        }
+
+        .picker-shell {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 100vh;
+        }
+
+        .picker-sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: auto;
+            background: var(--panel);
+            border-right: 1px solid var(--line);
+            padding: 20px 16px 40px;
+        }
+        .picker-sidebar h1 {
+            margin: 0 0 8px;
+            font-family: "Playfair Display SC", serif;
+            font-size: 28px;
+            color: #fff;
+        }
+        .picker-sidebar .intro {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+        .picker-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .picker-list li {
+            border: 1px solid var(--line);
+            background: var(--panel-2);
+            margin-bottom: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .picker-list label.row {
+            display: grid;
+            grid-template-columns: 22px 1fr;
+            gap: 8px;
+            padding: 10px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .picker-list .id {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+        }
+        .picker-list .name {
+            display: block;
+            color: #fff;
+            font-size: 13px;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .picker-list .hint {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        .picker-list .where {
+            display: none;
+            padding: 0 10px 10px 40px;
+        }
+        .picker-list li.selected .where { display: block; }
+        .picker-list select, .picker-list input[type="text"] {
+            width: 100%;
+            margin-top: 6px;
+            background: #0f0f0f;
+            border: 1px solid var(--line);
+            color: #fff;
+            border-radius: 4px;
+            padding: 7px 8px;
+            font-size: 12px;
+        }
+        .picker-actions {
+            position: sticky;
+            bottom: 0;
+            background: linear-gradient(transparent, var(--panel) 30%);
+            padding-top: 20px;
+        }
+        .picker-actions button, .jump-btn, .live-btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--accent); color: #111; width: 100%; }
+        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--line) !important; width: 100%; margin-top: 8px; }
+        #selection-output {
+            margin-top: 10px;
+            width: 100%;
+            min-height: 120px;
+            background: #0f0f0f;
+            border: 1px solid var(--line);
+            color: #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.45;
+            resize: vertical;
+        }
+
+        .picker-main { padding: 24px 20px 80px; }
+        .demo-card {
+            margin-bottom: 36px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #101010;
+            scroll-margin-top: 16px;
+        }
+        .demo-card.wanted {
+            border-color: rgba(245,197,24,.7);
+            box-shadow: 0 0 0 1px rgba(245,197,24,.25);
+        }
+        .demo-head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: #171717;
+            border-bottom: 1px solid var(--line);
+        }
+        .demo-head h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #fff;
+        }
+        .demo-head code {
+            color: var(--accent);
+            font-size: 12px;
+            word-break: break-word;
+        }
+        .demo-meta {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .demo-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+        .jump-btn { background: #2a2a2a; color: #fff; }
+        .live-btn { background: transparent; color: var(--accent); border: 1px solid rgba(245,197,24,.45) !important; }
+        .demo-stage {
+            position: relative;
+            background: #fff;
+            min-height: 160px;
+            color: #222;
+        }
+        .demo-stage.dark { background: #111; color: #eee; }
+        .demo-stage.hero {
+            height: 70vh;
+            min-height: 460px;
+            background: #000 url(img/background/SINGLE-bg.jpg) center/cover no-repeat;
+            color: #fff;
+        }
+
+        /* Force readable text on light Focus sections inside the picker */
+        .demo-stage:not(.dark):not(.hero) ,
+        .demo-stage:not(.dark):not(.hero) h1,
+        .demo-stage:not(.dark):not(.hero) h2,
+        .demo-stage:not(.dark):not(.hero) h3,
+        .demo-stage:not(.dark):not(.hero) h4,
+        .demo-stage:not(.dark):not(.hero) h5,
+        .demo-stage:not(.dark):not(.hero) h6,
+        .demo-stage:not(.dark):not(.hero) p,
+        .demo-stage:not(.dark):not(.hero) span,
+        .demo-stage:not(.dark):not(.hero) li,
+        .demo-stage:not(.dark):not(.hero) blockquote,
+        .demo-stage:not(.dark):not(.hero) .section-heading,
+        .demo-stage:not(.dark):not(.hero) .section-heading.secondary,
+        .demo-stage:not(.dark):not(.hero) .service-heading,
+        .demo-stage:not(.dark):not(.hero) .service-number,
+        .demo-stage:not(.dark):not(.hero) .intro-years h2,
+        .demo-stage:not(.dark):not(.hero) .intro-years h3,
+        .demo-stage:not(.dark):not(.hero) .intro-years h4,
+        .demo-stage:not(.dark):not(.hero) .facts-counter-number,
+        .demo-stage:not(.dark):not(.hero) .news-heading,
+        .demo-stage:not(.dark):not(.hero) .news-heading-link,
+        .demo-stage:not(.dark):not(.hero) .post-date,
+        .demo-stage:not(.dark):not(.hero) .img-caption,
+        .demo-stage:not(.dark):not(.hero) .link-underline,
+        .demo-stage:not(.dark):not(.hero) .link-underline-menu {
+            color: #222 !important;
+        }
+        .demo-stage:not(.dark):not(.hero) a {
+            color: #111 !important;
+        }
+        .demo-stage:not(.dark):not(.hero) .link-underline,
+        .demo-stage:not(.dark):not(.hero) .news-heading-link {
+            border-bottom-color: rgba(0,0,0,.35);
+        }
+
+        /* Keep medium-bg panels readable (they use light text in template) */
+        .demo-stage .sections-medium-bg,
+        .demo-stage .sections-medium-bg h1,
+        .demo-stage .sections-medium-bg h2,
+        .demo-stage .sections-medium-bg h3,
+        .demo-stage .sections-medium-bg h4,
+        .demo-stage .sections-medium-bg p,
+        .demo-stage .sections-medium-bg span,
+        .demo-stage .sections-medium-bg li,
+        .demo-stage .sections-medium-bg a,
+        .demo-stage .sections-medium-bg .skillbar-title,
+        .demo-stage .sections-medium-bg .skill-bar-percent,
+        .demo-stage .sections-medium-bg .link-underline.services {
+            color: #f2f2f2 !important;
+        }
+        .demo-stage .sections-medium-bg .blockquote.bg-color-1,
+        .demo-stage .sections-medium-bg .slick-left .blockquote {
+            color: #f2f2f2;
+        }
+
+        /* Explicit light panel text inside medium+bordered demo */
+        .demo-stage .light-copy {
+            color: #222 !important;
+        }
+        .demo-stage .light-copy h2,
+        .demo-stage .light-copy p {
+            color: #222 !important;
+        }
+
+        /* Nav demo on dark stage should stay light */
+        .demo-stage.dark .link-underline-menu,
+        .demo-stage.dark .nav > li > a,
+        .demo-stage.hero .home-page-title,
+        .thumb-wrap .home-page-title,
+        .menu-demo-wrap .menu-heading {
+            color: #fff !important;
+        }
+        .demo-note {
+            padding: 10px 16px;
+            background: #151515;
+            color: var(--muted);
+            font-size: 12px;
+            border-top: 1px solid var(--line);
+        }
+
+        /* Make demos readable/interactive */
+        .demo-stage .carousel-img-item { position: relative; min-height: 260px; margin-bottom: 16px; overflow: hidden; }
+        .demo-stage .carousel-img-item-1,
+        .demo-stage .carousel-img-item-2,
+        .demo-stage .carousel-img-item-3,
+        .demo-stage .carousel-img-item-4 {
+            position: absolute; inset: 0; background-size: cover; background-position: center;
+        }
+        .demo-stage .team-box {
+            position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2;
+            color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.7);
+        }
+        .demo-stage .team-box span { display: block; font-size: 12px; opacity: .85; }
+        .demo-stage .img-fullwidth-wrapper { min-height: 380px; }
+        .demo-stage .img-fullwidth { position: relative !important; width: 100% !important; min-height: 380px; }
+        .demo-stage .news-item { margin-bottom: 18px; }
+        .demo-stage .news-item img,
+        .demo-stage .legendary-gallery img,
+        .demo-stage .featured-grid img { width: 100%; height: auto; display: block; }
+        .demo-stage .legendary-gallery figure { margin-bottom: 12px; }
+
+        .thumb-wrap {
+            position: relative;
+            height: 70vh;
+            min-height: 460px;
+            overflow: hidden;
+            background: #000;
+        }
+        .thumb-wrap .swiper-slider-top { height: 100%; }
+        .thumb-wrap .swiper-slider-bottom {
+            position: absolute; left: 0; right: 0; bottom: 0; height: 96px;
+            box-sizing: border-box; padding: 10px; background: rgba(0,0,0,.4);
+            z-index: 4;
+        }
+        .thumb-wrap .swiper-slide { background-size: cover; background-position: center; }
+        .thumb-wrap .center-container { z-index: 5; }
+
+        .menu-demo-wrap { padding: 28px 12px; background: #111; }
+        .menu-demo-wrap .menu-container-photo {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 980px; margin: 0 auto;
+        }
+        .menu-demo-wrap .menu-item-photo {
+            width: 150px; height: 150px; position: relative; display: block;
+        }
+
+        .pswp-demo {
+            min-height: 160px; background: #1a1a1a; color: #ccc; padding: 20px;
+        }
+        .pswp-demo .pswp__container {
+            position: relative; min-height: 110px; border: 1px solid rgba(255,255,255,.2);
+            display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px;
+        }
+        .pswp-demo .pswp__item {
+            width: 120px; height: 80px; border: 1px solid rgba(255,255,255,.15);
+            background-size: cover; background-position: center;
+        }
+
+        .nav-demo .navbar { position: relative !important; }
+        .nav-demo .navbar-collapse { display: block !important; }
+
+        @media (max-width: 980px) {
+            .picker-shell { grid-template-columns: 1fr; }
+            .picker-sidebar { position: relative; height: auto; }
+        }
+    </style>
+</head>
+<body class="picker-page">
+    <span class="typed-title" style="display:none;" aria-hidden="true"></span>
+
+    <div class="picker-shell">
+        <aside class="picker-sidebar">
+            <h1>Container Picker</h1>
+            <p class="intro">
+                Preview each Focus container, try the interactions, then tick the ones you want
+                and choose where they should go. Copy the list and send it to me.
+            </p>
+
+            <ul class="picker-list" id="picker-list">
+                <!-- filled by JS from data attributes -->
+            </ul>
+
+            <div class="picker-actions">
+                <button class="btn-primary" type="button" id="btn-build">Build my selection list</button>
+                <button class="btn-secondary" type="button" id="btn-copy">Copy for chat</button>
+                <textarea id="selection-output" readonly placeholder="Your picks will appear here..."></textarea>
+            </div>
+        </aside>
+
+        <main class="picker-main" id="demos">
+
+            <!-- C01 -->
+            <article class="demo-card" id="C01" data-id="C01" data-class="container" data-best="Navigation, Footer, Maps" data-live="index-YOUTUBE-VIDEO.html">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C01</div>
+                        <h2>Standard container</h2>
+                        <code>class="container"</code>
+                        <div class="demo-meta">Best for: nav / footer / maps · Interaction: links + responsive collapse</div>
+                    </div>
+                    <div class="demo-tools">
+                        <a class="live-btn" href="index-YOUTUBE-VIDEO.html" target="_blank">Open live page</a>
+                    </div>
+                </div>
+                <div class="demo-stage dark nav-demo" style="padding:18px 0;">
+                    <nav class="navbar">
+                        <div class="container">
+                            <div class="navbar-header fadeIn-element">
+                                <div class="logo">
+                                    <a class="navbar-brand logo" href="#">
+                                        <img class="logo-light" src="img/logo-light.png" alt="Logo">
+                                        <img class="logo-dark" src="img/logo-dark.png" alt="Logo">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="main-navigation fadeIn-element">
+                                <div class="collapse navbar-collapse">
+                                    <ul class="nav navbar-nav navbar-right">
+                                        <li><a class="link-underline-menu active" href="#C01">Home</a></li>
+                                        <li><a class="link-underline-menu" href="#C02">About</a></li>
+                                        <li><a class="link-underline-menu" href="#C07">Works</a></li>
+                                        <li><a class="link-underline-menu" href="#C05">News</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="demo-note">Click menu links — they jump around this picker. On the real site they smooth-scroll sections.</div>
+            </article>
+
+            <!-- C02 -->
+            <article class="demo-card" id="C02" data-id="C02" data-class="container sections" data-best="About, Services, Contact content" data-live="index-YOUTUBE-VIDEO.html#about">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C02</div>
+                        <h2>Section container</h2>
+                        <code>class="container sections"</code>
+                        <div class="demo-meta">Best for: About / Services / text sections · Interaction: hover team cards</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#about" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container sections">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading section-heading-about">About</h2></div></div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="intro-years">
+                                    <h2>Years</h2><div class="borders-berlin"></div>
+                                    <h3 class="facts-counter-number">17</h3><h4>of Service</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-sm-8">
+                                <blockquote><p>Multidisciplinary creative with cinematic storytelling for brands and artists.</p></blockquote>
+                                <p>Fixed-width section spacing used across most Focus content blocks.</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-md-3"><div class="carousel-img-item"><div class="carousel-img-item-1"></div><div class="team-box">C. Eastwood<span>Chief Photographer</span></div></div></div>
+                            <div class="col-sm-6 col-md-3"><div class="carousel-img-item"><div class="carousel-img-item-2"></div><div class="team-box">R. Redford<span>Assistant</span></div></div></div>
+                            <div class="col-sm-6 col-md-3"><div class="carousel-img-item"><div class="carousel-img-item-3"></div><div class="team-box">M. Scorsese<span>Advertising</span></div></div></div>
+                            <div class="col-sm-6 col-md-3"><div class="carousel-img-item"><div class="carousel-img-item-4"></div><div class="team-box">W. Kar-wai<span>Editorial</span></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">Hover the team images for Focus hover treatments.</div>
+            </article>
+
+            <!-- C03 -->
+            <article class="demo-card" id="C03" data-id="C03" data-class="container sections sections-bordered" data-best="Bordered Services / content" data-live="index-SINGLE-IMAGE-BORDERED.html#services">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C03</div>
+                        <h2>Bordered section</h2>
+                        <code>class="container sections sections-bordered"</code>
+                        <div class="demo-meta">Best for: framed services/content · Interaction: same as C02, with border frame</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE-BORDERED.html#services" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container sections sections-bordered">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading">Services</h2></div></div>
+                        <div class="row text-center">
+                            <div class="col-md-4 services-block"><h4 class="service-heading">Full-day shoots</h4><div class="service-number">1</div><p>Commercial film production days.</p></div>
+                            <div class="col-md-4 services-block middle"><h4 class="service-heading">Lighting setup</h4><div class="service-number">2</div><p>Set lighting and camera package.</p></div>
+                            <div class="col-md-4 services-block"><h4 class="service-heading">Editing</h4><div class="service-number">3</div><p>Cut, grade, deliver.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- C04 -->
+            <article class="demo-card" id="C04" data-id="C04" data-class="container sections sections-bordered sections-bordered-about" data-best="About on bordered layouts" data-live="index-SINGLE-IMAGE-BORDERED.html#about">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C04</div>
+                        <h2>Bordered About</h2>
+                        <code>class="container sections sections-bordered sections-bordered-about"</code>
+                        <div class="demo-meta">Best for: About only on bordered homepage variants</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE-BORDERED.html#about" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container sections sections-bordered sections-bordered-about">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading section-heading-about">About</h2></div></div>
+                        <div class="row">
+                            <div class="col-md-4"><div class="intro-years"><h2>Years</h2><div class="borders-berlin"></div><h3 class="facts-counter-number">17</h3><h4>of Service</h4></div></div>
+                            <div class="col-md-8"><blockquote><p>Same About content, with About-specific bordered spacing.</p></blockquote></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- C05 -->
+            <article class="demo-card" id="C05" data-id="C05" data-class="container sections sections-correction" data-best="News / Contact spacing" data-live="index-YOUTUBE-VIDEO.html#news">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C05</div>
+                        <h2>Correction section</h2>
+                        <code>class="container sections sections-correction"</code>
+                        <div class="demo-meta">Best for: News · Interaction: hover cards / open live for carousel</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#news" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container sections sections-correction">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading">News</h2></div></div>
+                        <div class="row">
+                            <div class="col-sm-4"><div class="news-item"><figure class="news-content"><img src="img/news/news-1.jpg" alt=""><figcaption><span class="post-date">Aug 08, 2026</span><h3 class="news-heading"><a class="news-heading-link" href="#">City lights shoot</a></h3><p>Latest behind-the-scenes notes.</p></figcaption></figure></div></div>
+                            <div class="col-sm-4"><div class="news-item"><figure class="news-content"><img src="img/news/news-2.jpg" alt=""><figcaption><span class="post-date">Jul 21, 2026</span><h3 class="news-heading"><a class="news-heading-link" href="#">Brand film diary</a></h3><p>From moodboard to final cut.</p></figcaption></figure></div></div>
+                            <div class="col-sm-4"><div class="news-item"><figure class="news-content"><img src="img/news/news-3.jpg" alt=""><figcaption><span class="post-date">Jun 02, 2026</span><h3 class="news-heading"><a class="news-heading-link" href="#">Studio lighting</a></h3><p>Setup notes from a recent session.</p></figcaption></figure></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">On the live page this becomes an Owl carousel — use “Open live page” to feel the swipe/drag.</div>
+            </article>
+
+            <!-- C06 -->
+            <article class="demo-card" id="C06" data-id="C06" data-class="container sections sections-correction sections-bordered" data-best="Bordered News" data-live="index-SINGLE-IMAGE-BORDERED.html#news">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C06</div>
+                        <h2>Correction + bordered</h2>
+                        <code>class="container sections sections-correction sections-bordered"</code>
+                        <div class="demo-meta">Best for: News on bordered layouts</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE-BORDERED.html#news" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container sections sections-correction sections-bordered">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading">News (Bordered)</h2></div></div>
+                        <div class="row">
+                            <div class="col-sm-6"><div class="news-item"><figure class="news-content"><img src="img/news/news-4.jpg" alt=""><figcaption><h3 class="news-heading"><a class="news-heading-link" href="#">Portrait series</a></h3></figcaption></figure></div></div>
+                            <div class="col-sm-6"><div class="news-item"><figure class="news-content"><img src="img/news/news-5.jpg" alt=""><figcaption><h3 class="news-heading"><a class="news-heading-link" href="#">On location</a></h3></figcaption></figure></div></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- C07 -->
+            <article class="demo-card" id="C07" data-id="C07" data-class="container-fluid" data-best="Works gallery" data-live="index-YOUTUBE-VIDEO.html#works">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C07</div>
+                        <h2>Fluid container</h2>
+                        <code>class="container-fluid"</code>
+                        <div class="demo-meta">Best for: Works gallery · Interaction: click images to open lightbox</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#works" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container-fluid">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading section-heading-works">Works</h2></div></div>
+                        <div class="row text-center">
+                            <div class="legendary-gallery">
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/1.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/1.jpg" alt=""></a><figcaption><span class="img-caption">Caption 1</span></figcaption></figure>
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/2.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/2.jpg" alt=""></a><figcaption><span class="img-caption">Caption 2</span></figcaption></figure>
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/3.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/3.jpg" alt=""></a><figcaption><span class="img-caption">Caption 3</span></figcaption></figure>
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/4.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/4.jpg" alt=""></a><figcaption><span class="img-caption">Caption 4</span></figcaption></figure>
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/5.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/5.jpg" alt=""></a><figcaption><span class="img-caption">Caption 5</span></figcaption></figure>
+                                <figure class="col-sm-6 col-md-4 hover-effect-img"><a href="photoswipe/photos/large/6.jpg" data-size="1920x1280"><img class="img-responsive" src="photoswipe/photos/small/6.jpg" alt=""></a><figcaption><span class="img-caption">Caption 6</span></figcaption></figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">Click a thumbnail — PhotoSwipe lightbox should open (zoom/swipe/close).</div>
+            </article>
+
+            <!-- C08 -->
+            <article class="demo-card" id="C08" data-id="C08" data-class="container-fluid sections" data-best="Know-how / split sections" data-live="index-YOUTUBE-VIDEO.html#know-how">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C08</div>
+                        <h2>Fluid section</h2>
+                        <code>class="container-fluid sections"</code>
+                        <div class="demo-meta">Best for: Know-how / image+content splits</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#know-how" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container-fluid sections">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading secondary">The Know-how</h2></div></div>
+                        <div class="row">
+                            <div class="col-md-6 nopadding"><div class="img-fullwidth-wrapper"><div class="img-fullwidth img-fullwidth-all img-fullwidth-know-how-carousel-1"></div></div></div>
+                            <div class="col-md-6 nopadding">
+                                <div class="slick-left"><div class="blockquote bg-color-1">
+                                    <div class="center-container" style="position:relative;height:320px;"><div class="center-block">
+                                        <div class="show-skillbar">
+                                            <div class="skillbar" data-percent="95"><span class="skillbar-title">Fashion</span><div class="skillbar-bar" style="width:95%"></div><span class="skill-bar-percent">95%</span></div>
+                                            <div class="skillbar" data-percent="90"><span class="skillbar-title">Documentary</span><div class="skillbar-bar" style="width:90%"></div><span class="skill-bar-percent">90%</span></div>
+                                            <div class="skillbar" data-percent="85"><span class="skillbar-title">Architectural</span><div class="skillbar-bar" style="width:85%"></div><span class="skill-bar-percent">85%</span></div>
+                                        </div>
+                                    </div></div>
+                                </div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">Live page also has a slick image carousel on the left — open live to interact with that.</div>
+            </article>
+
+            <!-- C09 -->
+            <article class="demo-card" id="C09" data-id="C09" data-class="container-fluid sections sections-bordered" data-best="Featured strips (bordered)" data-live="index-SINGLE-IMAGE-BORDERED.html#featured">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C09</div>
+                        <h2>Fluid bordered section</h2>
+                        <code>class="container-fluid sections sections-bordered"</code>
+                        <div class="demo-meta">Best for: featured image strips with frame</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE-BORDERED.html#featured" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container-fluid sections sections-bordered featured-grid">
+                        <div class="row"><div class="col-lg-12 text-center"><h2 class="section-heading">Featured</h2></div></div>
+                        <div class="row">
+                            <div class="col-sm-6 col-md-3"><img src="img/featured/featured-thumb-1.jpg" alt=""></div>
+                            <div class="col-sm-6 col-md-3"><img src="img/featured/featured-thumb-2.jpg" alt=""></div>
+                            <div class="col-sm-6 col-md-3"><img src="img/featured/featured-thumb-3.jpg" alt=""></div>
+                            <div class="col-sm-6 col-md-3"><img src="img/featured/featured-thumb-4.jpg" alt=""></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- C10 -->
+            <article class="demo-card" id="C10" data-id="C10" data-class="container-fluid sections sections-medium-bg" data-best="Services accordion / testimonials band" data-live="index-YOUTUBE-VIDEO.html#services-2">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C10</div>
+                        <h2>Medium background section</h2>
+                        <code>class="container-fluid sections sections-medium-bg"</code>
+                        <div class="demo-meta">Best for: services accordion · Interaction: click accordion items</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#services-2" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container-fluid sections sections-medium-bg">
+                        <div class="row">
+                            <div class="col-md-6 nopadding"><div class="img-fullwidth-wrapper"><div class="img-fullwidth img-fullwidth-all img-fullwidth-services-single"></div></div></div>
+                            <div class="col-md-6 nopadding">
+                                <div class="slick-left"><div class="blockquote bg-color-1">
+                                    <div class="center-container" style="position:relative;height:340px;"><div class="center-block">
+                                        <div class="services-wrapper"><div class="services-accordion">
+                                            <ul>
+                                                <li><span>Branding</span>
+                                                    <ul>
+                                                        <li><a class="link-underline services" href="#">Branding Campaigns</a></li>
+                                                        <li><a class="link-underline services" href="#">Customer Surveys</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li><span>Photography</span>
+                                                    <ul>
+                                                        <li><a class="link-underline services" href="#">Fashion</a></li>
+                                                        <li><a class="link-underline services" href="#">Documentary</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li><span>Film</span>
+                                                    <ul>
+                                                        <li><a class="link-underline services" href="#">Commercials</a></li>
+                                                        <li><a class="link-underline services" href="#">Music videos</a></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div></div>
+                                    </div></div>
+                                </div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">Click “Branding / Photography / Film” headings to expand/collapse.</div>
+            </article>
+
+            <!-- C11 -->
+            <article class="demo-card" id="C11" data-id="C11" data-class="container-fluid sections sections-medium-bg sections-bordered" data-best="Bordered medium bands" data-live="index-SINGLE-IMAGE-BORDERED.html#services-2">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C11</div>
+                        <h2>Medium + bordered</h2>
+                        <code>class="container-fluid sections sections-medium-bg sections-bordered"</code>
+                        <div class="demo-meta">Best for: same as C10, on bordered homepage style</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE-BORDERED.html#services-2" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage">
+                    <div class="container-fluid sections sections-medium-bg sections-bordered">
+                        <div class="row">
+                            <div class="col-md-6 nopadding"><div class="img-fullwidth-wrapper"><div class="img-fullwidth img-fullwidth-all img-fullwidth-know-how-carousel-2"></div></div></div>
+                            <div class="col-md-6 light-copy" style="padding:40px 28px;">
+                                <h2 class="section-heading" style="text-align:left;">Medium + Border</h2>
+                                <p>Use when you want the grey band and the framed bordered look together.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- C12 -->
+            <article class="demo-card" id="C12" data-id="C12" data-class="center-container" data-best="Hero title overlay" data-live="index-SINGLE-IMAGE.html">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C12</div>
+                        <h2>Center container</h2>
+                        <code>class="center-container"</code>
+                        <div class="demo-meta">Best for: hero titles over fullscreen media</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-SINGLE-IMAGE.html" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage hero">
+                    <div class="center-container">
+                        <div class="center-block fadeIn-element">
+                            <h1 class="home-page-title">Focus</h1>
+                            <h2 class="home-page-title">Simplicity is complex</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">Vertically centers title content over a fullscreen hero background.</div>
+            </article>
+
+            <!-- C13 + C15 + C16 interactive together -->
+            <article class="demo-card" id="C15" data-id="C15" data-class="swiper-container swiper-slider-top" data-best="Thumbnail hero main slider" data-live="index-HERO-SLIDER-THUMBNAILS.html">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C15 + C16 + C13</div>
+                        <h2>Thumbnail hero (interactive)</h2>
+                        <code>swiper-slider-top</code> · <code>swiper-slider-bottom</code> · <code>center-container-thumbnail-slider</code>
+                        <div class="demo-meta">Best for: hero with clickable thumbs · Interaction: arrows, thumb clicks, autoplay</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-HERO-SLIDER-THUMBNAILS.html" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage dark">
+                    <div class="thumb-wrap hero-fullscreen">
+                        <div class="swiper-container swiper-slider-top">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide thumbnail-slider-bg-1"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-2"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-3"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-4"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-5"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-6"></div>
+                            </div>
+                            <div class="swiper-button-next swiper-button-white"></div>
+                            <div class="swiper-button-prev swiper-button-white"></div>
+                        </div>
+                        <div class="swiper-container swiper-slider-bottom">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide thumbnail-slider-bg-1"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-2"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-3"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-4"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-5"></div>
+                                <div class="swiper-slide thumbnail-slider-bg-6"></div>
+                            </div>
+                        </div>
+                        <div class="center-container center-container-thumbnail-slider">
+                            <div class="center-block fadeIn-element">
+                                <h1 class="home-page-title">Focus</h1>
+                                <h2 class="home-page-title">Aesthetic is a decision</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-note">
+                    Tick <strong>C13</strong>, <strong>C15</strong>, and <strong>C16</strong> in the sidebar if you want this hero set.
+                    Use arrows or bottom thumbnails.
+                </div>
+            </article>
+            <!-- hidden anchors for C13/C16 selection targets -->
+            <div id="C13" data-id="C13" data-class="center-container center-container-thumbnail-slider" data-best="Hero title over thumbnail slider" data-live="index-HERO-SLIDER-THUMBNAILS.html" hidden></div>
+            <div id="C16" data-id="C16" data-class="swiper-container swiper-slider-bottom" data-best="Hero thumbnail strip" data-live="index-HERO-SLIDER-THUMBNAILS.html" hidden></div>
+
+            <!-- C14 -->
+            <article class="demo-card" id="C14" data-id="C14" data-class="menu-container-photo" data-best="Photo fullscreen menu (*-2 pages)" data-live="index-YOUTUBE-VIDEO-2.html">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C14</div>
+                        <h2>Photo menu container</h2>
+                        <code>class="menu-container-photo"</code>
+                        <div class="demo-meta">Best for: image-tile navigation · Interaction: hover tiles</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO-2.html" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage dark menu-demo-wrap">
+                    <div class="menu-container-photo">
+                        <a href="#C01"><div class="menu-item-photo menu-item-home hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">Home</h6></div></div></div></a>
+                        <a href="#C02"><div class="menu-item-photo menu-item-about hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">About</h6></div></div></div></a>
+                        <a href="#C03"><div class="menu-item-photo menu-item-services hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">Services</h6></div></div></div></a>
+                        <a href="#C07"><div class="menu-item-photo menu-item-works hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">Works</h6></div></div></div></a>
+                        <a href="#C05"><div class="menu-item-photo menu-item-news hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">News</h6></div></div></div></a>
+                        <a href="#C17"><div class="menu-item-photo menu-item-contact hover-all"><div class="box-table"><div class="box-cell"><h6 class="menu-heading">Contact</h6></div></div></div></a>
+                    </div>
+                </div>
+                <div class="demo-note">Hover tiles for zoom. On *-2.html pages this opens as a fullscreen overlay menu.</div>
+            </article>
+
+            <!-- C17 -->
+            <article class="demo-card" id="C17" data-id="C17" data-class="pswp__container" data-best="Lightbox stage (used by Works)" data-live="index-YOUTUBE-VIDEO.html#works">
+                <div class="demo-head">
+                    <div>
+                        <div class="id">C17</div>
+                        <h2>PhotoSwipe container</h2>
+                        <code>class="pswp__container"</code>
+                        <div class="demo-meta">Best for: works lightbox internals · Interaction: use C07 gallery clicks</div>
+                    </div>
+                    <div class="demo-tools"><a class="live-btn" href="index-YOUTUBE-VIDEO.html#works" target="_blank">Open live page</a></div>
+                </div>
+                <div class="demo-stage pswp-demo">
+                    <div class="pswp__container">
+                        <div class="pswp__item" style="background-image:url(photoswipe/photos/small/1.jpg)"></div>
+                        <div class="pswp__item" style="background-image:url(photoswipe/photos/small/2.jpg)"></div>
+                        <div class="pswp__item" style="background-image:url(photoswipe/photos/small/3.jpg)"></div>
+                    </div>
+                </div>
+                <div class="demo-note">This is the lightbox stage. You usually don’t pick it alone — it comes with C07 Works.</div>
+            </article>
+
+        </main>
+    </div>
+
+    <!-- PhotoSwipe root required for C07 lightbox -->
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <div class="pswp__preloader"><div class="pswp__preloader__icn"><div class="pswp__preloader__cut"><div class="pswp__preloader__donut"></div></div></div></div>
+                </div>
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class="pswp__share-tooltip"></div></div>
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+                <div class="pswp__caption"><div class="pswp__caption__center"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/plugins.js"></script>
+    <script src="js/focus.js"></script>
+    <script>
+    (function () {
+        var places = [
+            "Hero",
+            "Navigation",
+            "About",
+            "Featured",
+            "Services",
+            "Works",
+            "News",
+            "Contact",
+            "Footer",
+            "Don't use / skip"
+        ];
+
+        var cards = Array.prototype.slice.call(document.querySelectorAll(".demo-card[data-id], [data-id][hidden]"));
+        // Prefer visible cards; also include hidden C13/C16 meta nodes
+        var items = [
+            { id: "C01", cls: "container", best: "Navigation / Footer" },
+            { id: "C02", cls: "container sections", best: "About / Services content" },
+            { id: "C03", cls: "container sections sections-bordered", best: "Bordered services/content" },
+            { id: "C04", cls: "container sections sections-bordered sections-bordered-about", best: "Bordered About" },
+            { id: "C05", cls: "container sections sections-correction", best: "News" },
+            { id: "C06", cls: "container sections sections-correction sections-bordered", best: "Bordered News" },
+            { id: "C07", cls: "container-fluid", best: "Works gallery" },
+            { id: "C08", cls: "container-fluid sections", best: "Know-how / splits" },
+            { id: "C09", cls: "container-fluid sections sections-bordered", best: "Featured bordered strip" },
+            { id: "C10", cls: "container-fluid sections sections-medium-bg", best: "Services accordion band" },
+            { id: "C11", cls: "container-fluid sections sections-medium-bg sections-bordered", best: "Bordered medium band" },
+            { id: "C12", cls: "center-container", best: "Hero title overlay" },
+            { id: "C13", cls: "center-container center-container-thumbnail-slider", best: "Hero title on thumbnail slider" },
+            { id: "C14", cls: "menu-container-photo", best: "Photo menu navigation" },
+            { id: "C15", cls: "swiper-container swiper-slider-top", best: "Thumbnail hero main slider" },
+            { id: "C16", cls: "swiper-container swiper-slider-bottom", best: "Thumbnail hero strip" },
+            { id: "C17", cls: "pswp__container", best: "Lightbox stage (with Works)" }
+        ];
+
+        var list = document.getElementById("picker-list");
+        items.forEach(function (item) {
+            var li = document.createElement("li");
+            li.dataset.target = item.id;
+            li.innerHTML =
+                '<label class="row">' +
+                    '<input type="checkbox" data-id="' + item.id + '">' +
+                    '<span><span class="id">' + item.id + '</span>' +
+                    '<span class="name">' + item.cls + '</span>' +
+                    '<span class="hint">' + item.best + '</span></span>' +
+                '</label>' +
+                '<div class="where">' +
+                    '<select data-place-for="' + item.id + '">' +
+                        places.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join("") +
+                    '</select>' +
+                    '<input type="text" data-note-for="' + item.id + '" placeholder="Optional note (e.g. replace services copy)">' +
+                '</div>';
+            list.appendChild(li);
+        });
+
+        function syncWanted() {
+            items.forEach(function (item) {
+                var checked = list.querySelector('input[data-id="' + item.id + '"]').checked;
+                var card = document.getElementById(item.id);
+                var li = list.querySelector('li[data-target="' + item.id + '"]');
+                if (li) li.classList.toggle("selected", checked);
+                if (card && card.classList.contains("demo-card")) card.classList.toggle("wanted", checked);
+            });
+        }
+
+        list.addEventListener("change", function (e) {
+            if (e.target.matches('input[type="checkbox"]')) syncWanted();
+        });
+
+        list.addEventListener("click", function (e) {
+            var li = e.target.closest("li[data-target]");
+            if (!li) return;
+            if (e.target.matches("input, select, textarea")) return;
+            var target = document.getElementById(li.dataset.target);
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        function buildSelection() {
+            var lines = ["Focus container picks for Moin Portfolio Web:", ""];
+            var any = false;
+            items.forEach(function (item) {
+                var checked = list.querySelector('input[data-id="' + item.id + '"]').checked;
+                if (!checked) return;
+                any = true;
+                var place = list.querySelector('[data-place-for="' + item.id + '"]').value;
+                var note = list.querySelector('[data-note-for="' + item.id + '"]').value.trim();
+                lines.push("- " + item.id + " `" + item.cls + "` → " + place + (note ? " (" + note + ")" : ""));
+            });
+            if (!any) lines.push("(none selected yet)");
+            lines.push("");
+            lines.push("Please add these into index.html / the YouTube homepage in the places above.");
+            document.getElementById("selection-output").value = lines.join("\n");
+            return lines.join("\n");
+        }
+
+        document.getElementById("btn-build").addEventListener("click", buildSelection);
+        document.getElementById("btn-copy").addEventListener("click", function () {
+            var text = buildSelection();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+                this.textContent = "Copied";
+                var btn = this;
+                setTimeout(function () { btn.textContent = "Copy for chat"; }, 1200);
+            } else {
+                var out = document.getElementById("selection-output");
+                out.select();
+                document.execCommand("copy");
+            }
+        });
+    })();
+    </script>
+</body>
+</html>
