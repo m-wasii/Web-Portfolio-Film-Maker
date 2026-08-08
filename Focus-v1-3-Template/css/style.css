@@ -539,27 +539,23 @@ vertical-align: middle;
 }
 
 
-/* section */
+/* section
+   Standardized spacing: even vertical rhythm across homepage sections */
 #about,
-#news {
-margin-top: -8px;
-}
-
+#news,
 #services,
-#google-maps {
-margin-top: -20px;
-}
-
-#testimonials {
-margin-top: 7px;
-}
-
-#works {
-margin-top: -15px;
-}
-
-#timeline {
-margin-top: -28px;
+#google-maps,
+#testimonials,
+#works,
+#timeline,
+#services-2,
+#featured,
+#get-in-touch,
+#contact,
+#facts,
+#footer {
+margin-top: 0;
+margin-bottom: 0;
 }
 
 @media only screen and (max-width: 640px) {
@@ -569,7 +565,8 @@ margin-top: -28px;
   #google-maps,
   #testimonials,
   #works,
-  #timeline {
+  #timeline,
+  #services-2 {
     margin-top: 0;
   }
 }
@@ -590,12 +587,12 @@ z-index: 5;
 }
 
 .sections-correction {
-margin-bottom: 117px;
+margin-bottom: 0;
 }
 
 @media only screen and (min-width: 880px) {
   .sections-correction {
-    margin-bottom: 87px;
+    margin-bottom: 0;
   }
 }
 
@@ -603,7 +600,7 @@ section {
 position: relative;
 width: 100%;
 height: auto;
-padding: 200px 0 0 0;
+padding: 100px 0;
 }
 
 section p {
@@ -612,34 +609,34 @@ padding-bottom: 10px;
 
 @media only screen and (max-width: 880px) {
   section {
-    padding: 100px 0 0 0;
+    padding: 72px 0;
   }
 }
 
 section.extra-spacer {
-margin: 192px 0 0 0;
+margin: 0;
 }
 
 @media only screen and (max-width: 880px) {
   section.extra-spacer {
-    margin: 200px 0 0 0;
+    margin: 0;
   }
 }
 
 section.extra-spacer-contact {
-margin: 177px 0 0 0;
+margin: 0;
 }
 
 @media only screen and (max-width: 640px) {
   section.extra-spacer-contact {
-    margin: 200px 0 0 0;
+    margin: 0;
   }
 }
 
 section.section-parallax {
 padding: 0;
-margin-top: -7px;
-margin-bottom: -200px;
+margin-top: 0;
+margin-bottom: 0;
 }
 
 section h2.section-heading {
@@ -1131,13 +1128,13 @@ filter: alpha(opacity=50);
 
 /* footer */
 #footer {
-padding: 180px 0 153px 0;
+padding: 100px 0 80px 0;
 text-align: center;
 }
 
 @media only screen and (max-width: 880px) {
   #footer {
-    padding: 120px 0 92px 0;
+    padding: 72px 0 64px 0;
   }
 }
 
@@ -3497,7 +3494,7 @@ display: block;
 width: 100%;
 height: 100%;
 overflow: hidden;
-padding: 200px 0;
+padding: 100px 0;
 }
 
 .parallax-facts {
@@ -4028,12 +4025,12 @@ padding: 0 0 0 10px;
 
 /* services */
 #services-2 {
-margin-top: -33px;
+margin-top: 0;
 }
 
 @media only screen and (max-width: 880px) {
   #services-2 {
-    margin-top: 67px;
+    margin-top: 0;
   }
 }
 
