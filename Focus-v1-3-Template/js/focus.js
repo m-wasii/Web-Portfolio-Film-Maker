@@ -414,7 +414,9 @@ $(function() {
 	
     // 14. YTPlayer
     $("#background-video").YTPlayer({
-        videoId: "r8j-MWq4HZc", // DEMO URL is: https://www.youtube.com/watch?v=r8j-MWq4HZc
+        // Placeholder: Big Buck Bunny (Blender Foundation, CC)
+        // Replace this videoId with Moin's showreel YouTube ID later
+        videoId: "aqz-KE-bpKQ", // https://www.youtube.com/watch?v=aqz-KE-bpKQ
         mute: true,             // options: true, false
         pauseOnScroll: false,
         repeat: true,
