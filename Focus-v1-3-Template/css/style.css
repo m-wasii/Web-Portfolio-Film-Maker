@@ -4860,7 +4860,7 @@ filter: alpha(opacity=85);
 
 .works-vimeo-gallery {
 position: relative;
-margin: -20px 20px 0 20px;
+margin: -20px 20px 40px 20px;
 overflow: hidden;
 }
 
