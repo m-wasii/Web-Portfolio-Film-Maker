@@ -37,6 +37,11 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+section[id] {
+  scroll-margin-top: 5.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

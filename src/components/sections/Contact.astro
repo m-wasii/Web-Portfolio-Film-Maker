@@ -73,7 +73,7 @@ const formspreeId = import.meta.env.PUBLIC_FORMSPREE_ID;
       >
         Send Message →
       </button>
-      {!formspreeId && (
+      {!formspreeId && import.meta.env.DEV && (
         <p class="text-sm text-muted">
           Set <code class="text-white">PUBLIC_FORMSPREE_ID</code> in Cloudflare env vars to enable form delivery.
         </p>
