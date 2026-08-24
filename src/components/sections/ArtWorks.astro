@@ -1,0 +1,19 @@
+---
+import SectionHeading from '../layout/SectionHeading.astro';
+import WorkGrid from '../ui/WorkGrid.astro';
+import works from '../../content/works.json';
+
+const artWorks = works.filter((w) => w.category === 'art');
+---
+
+<section id="art" class="section-padding border-t border-white/10 px-6">
+  <div class="mx-auto max-w-7xl">
+    <SectionHeading
+      title="Art & Films"
+      subtitle="Narrative films, documentaries, and personal projects."
+    />
+    <WorkGrid category="art" works={artWorks} initialCount={9} />
+  </div>
+</section>
+
+<script id="works-data-art" type="application/json" set:html={JSON.stringify(artWorks.map(({ title, vimeoId }) => ({ title, vimeoId })))} />

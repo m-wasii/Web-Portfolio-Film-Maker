@@ -1,0 +1,25 @@
+---
+import SectionHeading from '../layout/SectionHeading.astro';
+import site from '../../content/site.json';
+---
+
+<section id="about" class="section-padding border-t border-white/10 px-6">
+  <div class="mx-auto max-w-7xl">
+    <SectionHeading title="About" />
+    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+      <div class="reveal space-y-3">
+        {site.about.map((line) => (
+          <p class="highlight-box text-base leading-relaxed text-white md:text-lg">{line}</p>
+        ))}
+      </div>
+      <div class="reveal">
+        <h3 class="mb-6 font-display text-2xl uppercase tracking-wide text-white">What I do</h3>
+        <ul class="space-y-3">
+          {site.services.map((service) => (
+            <li class="border-b border-white/10 pb-3 text-base text-muted">{service}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

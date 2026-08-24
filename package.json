@@ -1,9 +1,10 @@
 {
-  "name": "home-ubuntu-moin-bin-umair-rebuild",
+  "name": "moin-bin-umair-rebuild",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "private": true,
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=20"
   },
   "scripts": {
     "dev": "astro dev",
@@ -12,6 +13,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.2.4"
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.4",
+    "tailwindcss": "^4.3.3"
   }
 }

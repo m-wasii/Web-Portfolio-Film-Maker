@@ -1,0 +1,15 @@
+---
+interface Props {
+  id?: string;
+  title: string;
+  subtitle?: string;
+  class?: string;
+}
+
+const { id, title, subtitle, class: className = '' } = Astro.props;
+---
+
+<div id={id} class={`reveal mb-12 md:mb-16 ${className}`}>
+  <h2 class="section-heading text-white">{title}</h2>
+  {subtitle && <p class="mt-4 max-w-2xl text-lg text-muted">{subtitle}</p>}
+</div>

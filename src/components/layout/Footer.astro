@@ -1,0 +1,26 @@
+---
+import site from '../../content/site.json';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 px-6 py-12">
+  <div class="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="font-display text-2xl uppercase tracking-wide text-white">{site.name}</p>
+      <p class="mt-2 text-base text-muted">{site.title}</p>
+    </div>
+    <div class="flex flex-wrap gap-6">
+      {site.social.map((item) => (
+        <a
+          href={item.href}
+          class="text-base text-muted transition hover:text-white"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+    <p class="text-sm text-muted">© {year} {site.name}. All rights reserved.</p>
+  </div>
+</footer>

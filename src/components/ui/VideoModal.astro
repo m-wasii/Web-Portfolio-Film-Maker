@@ -1,0 +1,44 @@
+<dialog id="video-modal" class="video-modal" aria-labelledby="video-modal-title">
+  <div class="relative mx-auto w-full max-w-6xl px-6">
+    <div class="mb-4 flex items-center justify-between gap-4">
+      <h3 id="video-modal-title" class="text-base text-white md:text-lg"></h3>
+      <button
+        type="button"
+        data-modal-close
+        class="shrink-0 border border-white/30 px-4 py-2 text-base text-white transition hover:border-white"
+        aria-label="Close video"
+      >
+        Close ✕
+      </button>
+    </div>
+    <div class="relative aspect-video w-full overflow-hidden bg-black">
+      <iframe
+        id="video-modal-frame"
+        class="absolute inset-0 h-full w-full"
+        src=""
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        title="Video player"
+      ></iframe>
+    </div>
+    <div class="mt-6 flex justify-center gap-4">
+      <button
+        type="button"
+        data-modal-prev
+        class="border border-white/30 px-6 py-2 text-base text-white transition hover:border-white"
+      >
+        ← Prev
+      </button>
+      <button
+        type="button"
+        data-modal-next
+        class="border border-white/30 px-6 py-2 text-base text-white transition hover:border-white"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>

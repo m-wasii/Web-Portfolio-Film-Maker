@@ -1,0 +1,53 @@
+---
+import site from '../../content/site.json';
+---
+
+<section id="home" class="relative flex min-h-screen items-end overflow-hidden">
+  <div class="absolute inset-0">
+    <img
+      src="/video/hero-poster.webp"
+      alt=""
+      class="h-full w-full object-cover"
+      fetchpriority="high"
+      width="1280"
+      height="720"
+    />
+    <video
+      id="hero-video"
+      class="absolute inset-0 h-full w-full object-cover opacity-80"
+      muted
+      loop
+      playsinline
+      preload="none"
+      poster="/video/hero-poster.webp"
+    >
+      <source src="/video/hero-loop.mp4" type="video/mp4" />
+    </video>
+    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20"></div>
+  </div>
+
+  <div class="relative z-10 w-full px-6 pb-20 pt-32 md:pb-28">
+    <div class="mx-auto max-w-7xl">
+      <p class="reveal mb-4 text-base text-muted">{site.title}</p>
+      <h1 class="reveal font-display text-[clamp(3rem,8vw,5rem)] font-medium uppercase leading-none tracking-wide text-white">
+        {site.name}
+      </h1>
+      <p class="reveal mt-6 max-w-xl text-lg text-white/80">{site.tagline}</p>
+      <div class="reveal mt-10 flex flex-wrap gap-4">
+        <a
+          href="#commercial"
+          class="inline-flex items-center gap-2 border border-white/30 px-6 py-3 text-base text-white transition hover:border-white hover:bg-white/5"
+        >
+          Commercials ↓
+        </a>
+        <a
+          href="#art"
+          class="inline-flex items-center gap-2 border border-white/30 px-6 py-3 text-base text-white transition hover:border-white hover:bg-white/5"
+        >
+          Art & Films ↓
+        </a>
+      </div>
+      <p class="reveal mt-8 text-sm text-muted">{site.availability}</p>
+    </div>
+  </div>
+</section>

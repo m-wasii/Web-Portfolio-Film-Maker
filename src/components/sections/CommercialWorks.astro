@@ -1,0 +1,19 @@
+---
+import SectionHeading from '../layout/SectionHeading.astro';
+import WorkGrid from '../ui/WorkGrid.astro';
+import works from '../../content/works.json';
+
+const commercialWorks = works.filter((w) => w.category === 'commercial');
+---
+
+<section id="commercial" class="section-padding px-6">
+  <div class="mx-auto max-w-7xl">
+    <SectionHeading
+      title="Commercial"
+      subtitle="Brand campaigns, commercials, and commissioned work."
+    />
+    <WorkGrid category="commercial" works={commercialWorks} initialCount={6} />
+  </div>
+</section>
+
+<script id="works-data-commercial" type="application/json" set:html={JSON.stringify(commercialWorks.map(({ title, vimeoId }) => ({ title, vimeoId })))} />

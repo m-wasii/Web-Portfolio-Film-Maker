@@ -1,0 +1,68 @@
+---
+interface Work {
+  title: string;
+  vimeoId: string;
+  thumbnail: string;
+  role: string;
+  year: string;
+}
+
+interface Props {
+  category: string;
+  works: Work[];
+  initialCount?: number;
+}
+
+const { category, works, initialCount = 9 } = Astro.props;
+const gridId = `works-grid-${category}`;
+---
+
+<div id={gridId} class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  {works.map((work, index) => (
+    <article
+      class:list={['reveal group', index >= initialCount && 'hidden']}
+      data-hidden-work={index >= initialCount ? true : undefined}
+    >
+      <button
+        type="button"
+        class="relative block w-full overflow-hidden text-left"
+        data-video-open
+        data-category={category}
+        data-index={index}
+        aria-label={`Play ${work.title}`}
+      >
+        <div class="relative aspect-video overflow-hidden bg-highlight">
+          <img
+            src={work.thumbnail}
+            alt={work.title}
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+            loading={index < 3 ? 'eager' : 'lazy'}
+            width="640"
+            height="360"
+          />
+          <span class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+            <span class="flex h-14 w-14 items-center justify-center rounded-full border border-white/80 text-white">
+              ▶
+            </span>
+          </span>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-muted">{work.role} · {work.year}</p>
+          <h3 class="mt-1 text-base font-medium text-white md:text-lg">{work.title}</h3>
+        </div>
+      </button>
+    </article>
+  ))}
+</div>
+
+{works.length > initialCount && (
+  <div class="reveal mt-12 text-center">
+    <button
+      type="button"
+      data-load-more={gridId}
+      class="border border-white/30 px-8 py-3 text-base text-white transition hover:border-white"
+    >
+      Load More ↓
+    </button>
+  </div>
+)}

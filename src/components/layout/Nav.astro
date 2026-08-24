@@ -1,0 +1,36 @@
+---
+import site from '../../content/site.json';
+const { nav } = site;
+---
+
+<header
+  id="site-nav"
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-all duration-300 [&.is-scrolled]:border-white/10 [&.is-scrolled]:bg-black/80 [&.is-scrolled]:backdrop-blur-md"
+>
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+    <a href="#home" class="font-display text-base font-medium uppercase tracking-wide text-white">
+      {site.name}
+    </a>
+    <nav class="hidden items-center gap-8 md:flex" aria-label="Main">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="nav-link"
+          data-section={item.href.replace('#', '')}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <details class="relative md:hidden">
+      <summary class="cursor-pointer list-none text-base text-white">Menu</summary>
+      <div class="absolute right-0 mt-3 min-w-48 rounded border border-white/10 bg-black p-4 shadow-xl">
+        {nav.map((item) => (
+          <a href={item.href} class="nav-link block py-2">
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </details>
+  </div>
+</header>

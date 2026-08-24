@@ -1,43 +1,98 @@
-# Astro Starter Kit: Minimal
+# Moin Bin Umair — Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+Modern single-page portfolio for **Moin Bin Umair**, rebuilt with Astro and Tailwind CSS. Inspired by minimal cinematic portfolio design — monochrome palette, self-hosted hero loop, Commercial / Art & Films sections, and full-screen Vimeo playback.
+
+## Stack
+
+- [Astro 7](https://astro.build) (static output)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- TypeScript (client scripts)
+- Hosted on **Cloudflare Pages**
+
+## Local development
+
+```bash
+git clone git@github.com:m-wasii/moin-bin-umair-rebuild.git
+cd moin-bin-umair-rebuild
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open [http://localhost:4321](http://localhost:4321).
 
-## 🚀 Project Structure
+Production build:
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm run build
+npm run preview
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Content
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Edit JSON files in `src/content/`:
 
-Any static assets, like images, can be placed in the `public/` directory.
+| File | Purpose |
+|------|---------|
+| `works.json` | Vimeo films (`category`: `commercial` or `art`) |
+| `timeline.json` | Career timeline entries |
+| `site.json` | Name, about copy, nav, contact email |
 
-## 🧞 Commands
+## Hero video
 
-All commands are run from the root of the project, from a terminal:
+Replace the placeholder loop at:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- `public/video/hero-loop.mp4`
+- `public/video/hero-poster.webp`
 
-## 👀 Want to learn more?
+The site uses the poster for LCP and lazy-plays the loop when the hero is visible.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Contact form (Formspree)
+
+1. Create a free form at [formspree.io](https://formspree.io)
+2. In Cloudflare Pages → Settings → Environment variables, add:
+   - `PUBLIC_FORMSPREE_ID` = your form ID
+
+## Deploy to Cloudflare Pages
+
+One-time setup:
+
+1. Push this repo to GitHub (`moin-bin-umair-rebuild`)
+2. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com) → **Workers & Pages**
+3. **Create** → **Pages** → **Import an existing Git repository**
+4. Select `moin-bin-umair-rebuild`
+5. Build settings:
+
+| Setting | Value |
+|---------|-------|
+| Production branch | `main` |
+| Framework preset | Astro |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Node version | `20` |
+
+6. **Save and Deploy**
+
+Every push to `main` triggers a new deploy. Preview URLs are created for pull requests automatically.
+
+### Custom domain
+
+In Cloudflare Pages → your project → **Custom domains**, add your domain. If DNS is already on Cloudflare, HTTPS is provisioned automatically.
+
+## Project structure
+
+```
+src/
+├── components/     # Astro UI components
+├── content/        # JSON data (works, timeline, site)
+├── layouts/        # Page shell
+├── pages/          # index.astro (single page)
+├── scripts/        # Client JS (cursor, modal, scroll)
+└── styles/         # Tailwind + design tokens
+public/
+├── img/            # Timeline images
+└── video/          # Hero loop + poster
+```
+
+## License
+
+Private — © Moin Bin Umair

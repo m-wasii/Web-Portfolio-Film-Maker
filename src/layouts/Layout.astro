@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+import site from '../content/site.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${site.name} — Director · Cinematographer`,
+  description = site.tagline,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/video/hero-poster.webp" as="image" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <script src="../scripts/main.ts"></script>
+  </body>
+</html>

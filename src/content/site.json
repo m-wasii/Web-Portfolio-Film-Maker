@@ -1,0 +1,31 @@
+{
+  "name": "Moin Bin Umair",
+  "title": "Director · Cinematographer · Photographer",
+  "tagline": "Simplicity is complex. Design is a process. Style is everything.",
+  "availability": "Available for projects",
+  "email": "hello@moinbinumair.com",
+  "about": [
+    "Director and cinematographer working across film, commercial, and documentary.",
+    "I make work that captures what goes unsaid — a feeling that never found words, a moment that passed before anyone noticed.",
+    "From narrative shorts to brand campaigns, every frame is a deliberate choice in light, movement, and story."
+  ],
+  "services": [
+    "Film Direction",
+    "Cinematography",
+    "Commercial Production",
+    "Brand Campaigns",
+    "Documentary"
+  ],
+  "nav": [
+    { "label": "Commercials", "href": "#commercial" },
+    { "label": "Art & Films", "href": "#art" },
+    { "label": "About", "href": "#about" },
+    { "label": "Timeline", "href": "#timeline" },
+    { "label": "Contact", "href": "#contact" }
+  ],
+  "social": [
+    { "label": "Vimeo", "href": "https://vimeo.com", "icon": "vimeo" },
+    { "label": "Instagram", "href": "https://instagram.com", "icon": "instagram" },
+    { "label": "LinkedIn", "href": "https://linkedin.com", "icon": "linkedin" }
+  ]
+}
